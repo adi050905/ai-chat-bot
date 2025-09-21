@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pytest_cache/
+.mypy_cache/
+
+# Environments
+.venv/
+.env
+.env.*
+
+# OS/editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# SQLite database
+chatbot.db
+
+# Build/output
+.next/
+node_modules/
+frontend/
+legacy_frontend/

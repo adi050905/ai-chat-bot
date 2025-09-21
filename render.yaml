@@ -1,0 +1,28 @@
+services:
+  - type: web
+    name: ai-talk-bot
+    env: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn -w 2 -k gthread -b 0.0.0.0:$PORT app:app
+    autoDeploy: true
+    disk:
+      name: data
+      mountPath: /var/data
+      sizeGB: 1
+    envVars:
+      - key: ENVIRONMENT
+        value: production
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ALLOWED_ORIGINS
+        value: https://ai-talk-bot.onrender.com
+      - key: SESSION_COOKIE_SECURE
+        value: true
+      - key: FORCE_HTTPS
+        value: true
+      - key: DATABASE_PATH
+        value: /var/data/chatbot.db
+      # Uncomment and set if you have it
+      # - key: GEMINI_API_KEY
+      #   sync: false

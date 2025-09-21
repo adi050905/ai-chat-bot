@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced AI Chatbot</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style_advanced.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Background particles -->
+    <div class="particles" id="particles"></div>
+    
+    <!-- Theme toggle -->
+    <div class="theme-toggle" id="themeToggle">
+        <i class="fas fa-moon"></i>
+    </div>
+
+    <!-- Sidebar for chat history -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h3><i class="fas fa-history"></i> Chat History</h3>
+            <button class="sidebar-toggle" id="sidebarToggle">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="chat-history" id="chatHistory">
+            <div class="loading-sessions">
+                <i class="fas fa-spinner"></i>
+                <div>Loading sessions...</div>
+            </div>
+        </div>
+        <button class="new-chat-btn" id="newChatBtn">
+            <i class="fas fa-plus"></i> New Chat
+        </button>
+        
+        <!-- Database Stats -->
+        <div class="sidebar-section">
+            <h4><i class="fas fa-chart-bar"></i> Statistics</h4>
+            <div class="database-stats">
+                <div class="stat-item">
+                    <span class="stat-label">Loading...</span>
+                    <span class="stat-value">...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="chat-container">
+            <div class="chat-header">
+                <div class="header-left">
+                    <button class="menu-btn" id="menuBtn">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <div class="header-info">
+                        <h1><i class="fas fa-robot"></i> Advanced AI Chatbot</h1>
+                        <p>Powered by multiple AI services</p>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <div class="ai-selector">
+                        <label for="aiService"><i class="fas fa-brain"></i></label>
+                        <select id="aiService" onchange="updateAIService()">
+                            <option value="auto">🤖 Auto (Best Available)</option>
+                            <option value="gemini">🧠 Gemini AI (Google)</option>
+                            <option value="deepseek">🆓 Free Backup AI</option>
+                        </select>
+                    </div>
+                    <button class="new-chat-header" id="headerNewChatBtn" title="New Chat">
+                        <i class="fas fa-plus"></i> New
+                    </button>
+                    <div class="connection-status" id="connectionStatus">
+                        <div class="status-dot online"></div>
+                        <span>Connected</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="chat-messages" id="chatMessages">
+                <div class="message bot-message" data-animation="slide-in">
+                    <div class="message-content">
+                        <div class="message-avatar">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                        <div class="message-bubble">
+                            <div class="message-text">
+                                Welcome to the Advanced AI Chatbot! I'm here to help you with any questions or tasks. Choose your preferred AI service from the dropdown above, or let me automatically select the best available option for you.
+                            </div>
+                            <div class="message-footer">
+                                <div class="message-time" id="initial-time"></div>
+                                <div class="message-status">
+                                    <i class="fas fa-check-double delivered"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Typing indicator -->
+                <div class="typing-indicator" id="typingIndicator" style="display: none;">
+                    <div class="typing-avatar">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div class="typing-bubble">
+                        <div class="typing-dots">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                        <div class="typing-text">AI is typing...</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="chat-input-container">
+                <div class="input-suggestions" id="inputSuggestions">
+                    <button class="suggestion-chip" onclick="insertSuggestion('Tell me a joke')">
+                        <i class="fas fa-laugh"></i> Tell me a joke
+                    </button>
+                    <button class="suggestion-chip" onclick="insertSuggestion('Explain quantum physics')">
+                        <i class="fas fa-atom"></i> Explain quantum physics
+                    </button>
+                    <button class="suggestion-chip" onclick="insertSuggestion('Write a poem')">
+                        <i class="fas fa-feather-alt"></i> Write a poem
+                    </button>
+                    <button class="suggestion-chip" onclick="insertSuggestion('Help me code')">
+                        <i class="fas fa-code"></i> Help me code
+                    </button>
+                </div>
+                
+                <div class="chat-input">
+                    <div class="input-wrapper">
+                        <button class="attach-btn" id="attachBtn" title="Attach file">
+                            <i class="fas fa-paperclip"></i>
+                        </button>
+                        <textarea id="messageInput" placeholder="Type your message..." maxlength="2000" rows="1"></textarea>
+                        <div class="input-actions">
+                            <button class="emoji-btn" id="emojiBtn" title="Add emoji">
+                                <i class="fas fa-smile"></i>
+                            </button>
+                            <button id="sendButton" class="send-btn" title="Send message">
+                                <span id="sendButtonText">
+                                    <i class="fas fa-paper-plane"></i>
+                                </span>
+                                <div id="sendButtonSpinner" class="spinner" style="display: none;">
+                                    <i class="fas fa-spinner fa-spin"></i>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="input-footer">
+                    <div class="input-hint">
+                        <span class="char-count" id="charCount">0/2000</span>
+                        <span class="separator">•</span>
+                        <span class="shortcuts">
+                            <kbd>Enter</kbd> to send • <kbd>Shift+Enter</kbd> for new line • <kbd>Ctrl+K</kbd> to clear
+                        </span>
+                    </div>
+                    <div class="ai-status" id="aiStatus">
+                        <i class="fas fa-circle"></i>
+                        <span>Ready</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating action button for mobile -->
+    <div class="fab" id="fab">
+        <i class="fas fa-comment"></i>
+    </div>
+
+    <!-- Settings modal -->
+    <div class="modal" id="settingsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-cog"></i> Settings</h3>
+                <button class="modal-close" id="modalClose">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="setting-group">
+                    <label>Theme</label>
+                    <div class="theme-options">
+                        <button class="theme-option active" data-theme="light">
+                            <i class="fas fa-sun"></i> Light
+                        </button>
+                        <button class="theme-option" data-theme="dark">
+                            <i class="fas fa-moon"></i> Dark
+                        </button>
+                        <button class="theme-option" data-theme="auto">
+                            <i class="fas fa-adjust"></i> Auto
+                        </button>
+                    </div>
+                </div>
+                <div class="setting-group">
+                    <label>Animation Speed</label>
+                    <input type="range" id="animationSpeed" min="0.5" max="2" step="0.1" value="1">
+                </div>
+                <div class="setting-group">
+                    <label>Sound Effects</label>
+                    <div class="toggle-switch">
+                        <input type="checkbox" id="soundEffects" checked>
+                        <label for="soundEffects"></label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
