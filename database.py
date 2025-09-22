@@ -79,7 +79,7 @@ class ChatDatabase:
         self.init_database()
 
     def init_database(self):
-        Base.message_metadata.create_all(self.engine)
+        Base.metadata.create_all(self.engine)
         if self.using_url.startswith("sqlite"):
             print(f"✅ Database initialized at {self.using_url}")
         else:
