@@ -48,7 +48,7 @@ class Message(Base):
     message_type: Mapped[str] = mapped_column(String)
     content: Mapped[str] = mapped_column(Text, nullable=False)
     timestamp: Mapped[Optional[dt.datetime]] = mapped_column(DateTime, server_default=func.current_timestamp())
-    metadata: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    message_metadata: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     session: Mapped["ChatSession"] = relationship("ChatSession", back_populates="messages")
 
 
@@ -79,7 +79,7 @@ class ChatDatabase:
         self.init_database()
 
     def init_database(self):
-        Base.metadata.create_all(self.engine)
+        Base.message_metadata.create_all(self.engine)
         if self.using_url.startswith("sqlite"):
             print(f"✅ Database initialized at {self.using_url}")
         else:
@@ -133,7 +133,7 @@ class ChatDatabase:
             )
             out: List[Dict] = []
             for r in rows:
-                meta = json.loads(r.metadata) if (r.metadata is not None) else {}
+                meta = json.loads(r.message_metadata) if (r.message_metadata is not None) else {}
                 out.append({
                     'id': int(r.id),
                     'type': r.message_type,
